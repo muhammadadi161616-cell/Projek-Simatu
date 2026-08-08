@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { X } from 'lucide-react';
 import { validateTaskTitle } from '../utils/validation';
+import UserService from '../services/UserService';
 
 const TaskForm = ({ task, onSubmit, onClose, userRole }) => {
     const [title, setTitle] = useState('');
@@ -9,9 +10,24 @@ const TaskForm = ({ task, onSubmit, onClose, userRole }) => {
     const [priority, setPriority] = useState('Medium');
     const [dueDate, setDueDate] = useState('');
     const [assigneeId, setAssigneeId] = useState('');
+    const [users, setUsers] = useState([]);
 
     const [error, setError] = useState('');
     const [submitting, setSubmitting] = useState(false);
+
+    useEffect(() => {
+        if (userRole === 'admin') {
+            const loadUsers = async () => {
+                try {
+                    const data = await UserService.getAll();
+                    setUsers(data);
+                } catch (err) {
+                    console.error('Gagal mengambil daftar pengguna', err);
+                }
+            };
+            loadUsers();
+        }
+    }, [userRole]);
 
     useEffect(() => {
         if (task) {
@@ -169,15 +185,20 @@ const TaskForm = ({ task, onSubmit, onClose, userRole }) => {
                         {userRole === 'admin' && (
                             <div className="space-y-1.5">
                                 <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider">
-                                    ID Pelaksana (Assignee ID)
+                                    Pelaksana Tugas
                                 </label>
-                                <input
-                                    type="number"
+                                <select
                                     value={assigneeId}
                                     onChange={(e) => setAssigneeId(e.target.value)}
-                                    placeholder="Biarkan kosong untuk diri sendiri"
-                                    className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-800 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 focus:bg-white transition-all"
-                                />
+                                    className="w-full px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-800 text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 focus:bg-white transition-all"
+                                >
+                                    <option value="">Pilih Pelaksana (Default: Diri Sendiri)</option>
+                                    {users.map(u => (
+                                        <option key={u.id} value={u.id}>
+                                            {u.name} ({u.role})
+                                        </option>
+                                    ))}
+                                </select>
                             </div>
                         )}
                     </div>
