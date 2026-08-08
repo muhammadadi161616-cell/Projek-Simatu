@@ -20,8 +20,9 @@ router.post('/data', auth, validateTask, TaskController.create);
 router.put('/data/:id', auth, validateTask, TaskController.update);
 router.delete('/data/:id', auth, TaskController.delete);
 
-// Dashboard Statistics & Activity Logs routes
+// Dashboard Statistics, Users & Activity Logs routes
 router.get('/stats', auth, TaskController.getStats);
 router.get('/logs', auth, ActivityLogController.getAll);
+router.get('/users', auth, UserController.listUsers);
 
 module.exports = router;

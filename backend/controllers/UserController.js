@@ -118,6 +118,18 @@ class UserController {
             next(error);
         }
     }
+
+    static async listUsers(req, res, next) {
+        try {
+            if (req.user.role !== 'admin') {
+                return res.status(403).json({ message: 'Akses ditolak: Hanya admin yang dapat melihat daftar pengguna' });
+            }
+            const users = await User.findAll();
+            res.json(users);
+        } catch (error) {
+            next(error);
+        }
+    }
 }
 
 module.exports = UserController;
