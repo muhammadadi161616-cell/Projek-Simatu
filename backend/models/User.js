@@ -30,6 +30,11 @@ class User {
         );
         return result.insertId;
     }
+
+    static async findAll() {
+        const [rows] = await db.execute('SELECT id, name, email, role, created_at FROM users');
+        return rows.map(row => new User(row));
+    }
 }
 
 module.exports = User;
